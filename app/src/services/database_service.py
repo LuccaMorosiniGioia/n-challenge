@@ -44,7 +44,7 @@ class DatabaseService:
     def __open_db_conn__(self) -> None:
         return self.__create_engine__().connect()
 
-    async def query_db(self, query: str) -> pd.DataFrame:
+    def query_db(self, query: str) -> pd.DataFrame:
         with self.__open_db_conn__() as conn:
             try:
                 df = pd.read_sql(query, conn)
@@ -65,14 +65,6 @@ class DatabaseService:
             )
             self.db.add(db_record)
             self.db.commit()
-
-            # # Salva no S3
-            # key = f"conversations/{conversation_data['organization']}/{datetime.now().strftime('%Y/%m/%d/%H%M%S')}.json"
-            # self.s3.put_object(
-            #     Bucket=self.settings.S3_BUCKET,
-            #     Key=key,
-            #     Body=json.dumps(conversation_data),
-            # )
 
             print("Saved conversations!")
 

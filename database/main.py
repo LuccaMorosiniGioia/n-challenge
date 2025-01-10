@@ -43,10 +43,9 @@ def query_db(query: str) -> pd.DataFrame:
 
 # df = pd.read_csv("train.csv")
 # df = df[['REF_DATE', 'TARGET', 'VAR2', 'IDADE', 'VAR4', 'VAR5', 'VAR8']]
-# df = df.set_axis(['REF_DATE', 'TARGET', 'SEXO', 'IDADE','OBITO', 'UF', 'CLASSE'], axis='columns')
-# df['REF_DATE'] = pd.to_datetime(df['REF_DATE'], format='%Y-%m-%d %H:%M:%S+00:00')
+# df = df.set_axis(['ref_date', 'target', 'sexo', 'idade','obito', 'uf', 'classe'], axis='columns')
+# df['ref_date'] = pd.to_datetime(df['ref_date'], format='%Y-%m-%d %H:%M:%S+00:00')
 
-# print(df)
 # df.to_csv("train_cleaned.csv", index=False)
 
 df = pd.read_csv("train_cleaned.csv")
@@ -55,7 +54,7 @@ try:
     conn = open_db_conn()
     conn.autocommit = True
     
-    df.to_sql('credit_score', con=conn, if_exists='replace', 
+    df.to_sql('credit_sc', con=conn, if_exists='replace', 
             index=False) 
 
     conn.commit() 
