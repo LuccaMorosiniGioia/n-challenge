@@ -3,8 +3,10 @@ from openai import OpenAI
 from typing import Dict
 import json
 
+
 from ..tools.create_scatter_chart_tool import create_scatter_chart_tool
 from ..tools.create_bar_chart_tool import create_bar_chart_tool
+from ..tools.create_horizontal_bar_chart_tool import create_horizontal_bar_chart_tool
 from ..config.settings import Settings
 import matplotlib.pyplot as plt
 from ast import literal_eval
@@ -22,8 +24,9 @@ class PlotService:
         self.client = OpenAI()
         self.messages = self.settings.BASE_PLOT_MESSAGES
         self.tools = [
-            # create_bar_chart_tool,
-            create_scatter_chart_tool
+            create_bar_chart_tool,
+            create_scatter_chart_tool,
+            create_horizontal_bar_chart_tool,
         ]
 
     def __append_to_msgs__(self, message: str, role: str) -> None:
@@ -41,26 +44,69 @@ class PlotService:
             print(f"Error processing message on plot service: {e}")
             raise RuntimeError(f"{e}")
 
-    def __process_bar_chart__(self, tool_args: Dict[str, str]) -> plt.figure:
-        x = literal_eval(tool_args.get("x-axis"))
-        y = literal_eval(tool_args.get("y-axis"))
+    def __eval_arr__(self, arr) -> list:
+        if not isinstance(arr, list):
+            # Ensure that null is a string
+            arr = arr.replace("null", '"null"').replace('""', '"')
+
+            if "[" in arr and "]" in arr:
+                try:
+                    return literal_eval(arr)
+                except Exception as e:
+                    print(f"Error evaluating array: {e}")
+                    raise RuntimeError(f"{e}")
+            else:
+                try:
+                    arr = arr.split(",")
+                except Exception as e:
+                    print(f"Error evaluating array: {e}")
+                    raise RuntimeError(f"{e}")
+        try:
+            arr = [float(x) for x in arr]  # Try to convert to float
+        except Exception as e:
+            print(f"Error converting to float: {e}")
+
+        return arr
+
+    def __process_h_bar_chart__(self, tool_args: Dict[str, str]) -> plt.figure:
+        x = self.__eval_arr__(tool_args.get("x-axis"))
+        y = self.__eval_arr__(tool_args.get("y-axis"))
         title = tool_args.get("title")
+        xlabel = tool_args.get("x-label")
+        ylabel = tool_args.get("y-label")
+
+        fig, ax = plt.subplots()
+
+        plt.xticks(rotation=45)
+        ax.barh(x, y, align="center")
+        ax.invert_yaxis()
+        ax.set_xlabel(ylabel)
+        ax.set_ylabel(xlabel)
+        ax.set_title(title)
+
+        return fig
+
+    def __process_bar_chart__(self, tool_args: Dict[str, str]) -> plt.figure:
+        x = self.__eval_arr__(tool_args.get("x-axis"))
+        y = self.__eval_arr__(tool_args.get("y-axis"))
+        title = tool_args.get("title")
+        xlabel = tool_args.get("x-label")
         ylabel = tool_args.get("y-label")
 
         fig, ax = plt.subplots()
         ax.bar(x, y)
 
-        if len(x) >= 10:
-            plt.xticks(rotation=45, ha="left")
+        plt.xticks(rotation=45)
+        ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
         ax.set_title(title)
 
         return fig
 
     def __process_scatter_plot__(self, tool_args: Dict[str, str]) -> plt.figure:
-        classes = literal_eval(tool_args.get("classes"))
-        x = literal_eval(tool_args.get("x-axis"))
-        y = literal_eval(tool_args.get("y-axis"))
+        classes = self.__eval_arr__(tool_args.get("classes"))
+        x = self.__eval_arr__(tool_args.get("x-axis"))
+        y = self.__eval_arr__(tool_args.get("y-axis"))
         title = tool_args.get("title")
         xlabel = tool_args.get("x-label")
         ylabel = tool_args.get("y-label")
@@ -68,12 +114,15 @@ class PlotService:
         fig, ax = plt.subplots()
 
         if isinstance(classes, str):
-            ax.scatter(x[0], y[0], label=classes, alpha=0.3, edgecolors="none")
+            ax.scatter(x[0], y[0], label=classes, alpha=0.8, edgecolors="none")
+            ax.set_xticks(x[0])
+            ax.set_xticklabels(x[0], rotation=45)
         else:
             for index, clss in enumerate(classes):
-                ax.scatter(x[index], y[index], label=clss, alpha=0.3, edgecolors="none")
+                ax.scatter(x[index], y[index], label=clss, alpha=0.8, edgecolors="none")
+                ax.set_xticks(x[index])
+                ax.set_xticklabels(x[index], rotation=45)
 
-        plt.xticks(rotation=45, ha="left")
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
         ax.set_title(title)
@@ -91,6 +140,10 @@ class PlotService:
         processor_map = {
             "create_bar_chart": ("Bar Chart", self.__process_bar_chart__),
             "create_scatter_chart": ("Scatter Plot", self.__process_scatter_plot__),
+            "create_horizontal_bar_chart_tool": (
+                "Horizontal Bar Chart",
+                self.__process_h_bar_chart__,
+            ),
         }
 
         plots = []

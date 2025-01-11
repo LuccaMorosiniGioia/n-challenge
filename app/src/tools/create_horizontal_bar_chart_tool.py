@@ -1,9 +1,9 @@
-create_bar_chart_tool = {
+create_horizontal_bar_chart_tool = {
     "type": "function",
     "function": {
-        "name": "create_bar_chart",
+        "name": "create_horizontal_bar_chart_tool",
         "description": f"""
-                Use this function to create a bar chart. You must ensure the data you pass is in the correct format.
+                Use this function to create a horizontal bar chart. You must ensure the data you pass is in the correct format.
                 Use this graph whenever you need to compare up to two variables.
                 """,
         "parameters": {

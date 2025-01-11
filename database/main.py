@@ -54,7 +54,7 @@ try:
     conn = open_db_conn()
     conn.autocommit = True
     
-    df.to_sql('credit_sc', con=conn, if_exists='replace', 
+    df.to_sql('credit_score', con=conn, if_exists='replace', 
             index=False) 
 
     conn.commit() 

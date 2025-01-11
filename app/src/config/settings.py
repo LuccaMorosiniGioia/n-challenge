@@ -63,13 +63,7 @@ class Settings(BaseModel):
                     ```
                     ## Style Guidelines
                     Your internal monologue should reflect these characteristics:
-                    1. Natural Thought Flow
-                    ```
-                    "Wait, that doesn't seem right..."
-                    "Maybe I should approach this differently..."
-                    "Going back to what I thought earlier..."
-                    ```
-                    2. Progressive Building
+                    1. Progressive Building
                     ```
                     "Starting with the basics..."
                     "Building on that last point..."
@@ -131,6 +125,8 @@ class Settings(BaseModel):
                         You must use the following table: credit_sc.
                         ## The table has the following schema:
                         - ref_date: TEXT - Reference date of the credit score;
+                            # Always work with grouped dates. 
+                            # For example, group dates by month, year, or the one that fits better with the question. If working with longer periods minimum granularity is by month.
                         - target: INTEGER - 0 indicates a good payer and 1 a bad payer. To be categorized as 1 the person must have a debt with more than 60 days in the last 2 months;
                         - sexo: TEXT - M: Male. F: Female;
                         - idade: FLOAT - Age in years;
@@ -171,9 +167,11 @@ class Settings(BaseModel):
                         You can choose not to plot the data if it does not fit in any of the available plots or choose multiple plots if the data fits in more than one plot.
                         The possible plots are:
                             # Vertical Bar Chart
+                                Use this graph whenever you need to compare up to two variables.
                                 x-axis: array, the x values of the bars.
                                 y-axis: array, the y values of the bars.
                             # Scatter Plot:
+                                You should use this graph whenever you need to compare more than two variables.
                                 classes: array, the classes of the points.
                                 x-axis: matrix, the x values for each class. The number of rows must be the same as the number of classes.
                                 y-axis: matrix, the y values for each class. The number of rows must be the same as the number of classes.

@@ -6,7 +6,8 @@ import json
 import datetime as dt
 from typing import Dict, Any, Tuple, List
 from sqlalchemy.engine import URL, Engine
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.sql import text
+from sqlalchemy.orm import scoped_session, sessionmaker, Session
 from ..models.conversations_history import ConversationHistory
 from ..config.settings import Settings
 
@@ -18,15 +19,6 @@ class DatabaseService:
         self.database = self.settings.DATABASE
         self.database_user = self.settings.DATABASE_USER
         self.database_pass = self.settings.DATABASE_PASS
-        self.db = self.__get_db__()
-
-    def __get_db__(self) -> Session:
-        engine = self.__create_engine__()
-        db = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-        try:
-            yield db
-        finally:
-            db.close()
 
     def __create_engine__(self) -> Engine:
         connection_url = URL.create(
@@ -54,47 +46,29 @@ class DatabaseService:
 
         return df
 
-    async def save_conversation(self, conversation_data: Dict) -> bool:
+    def save_conversation(self, messages: Dict) -> bool:
         try:
-            # Salva no RDS
-            db_record = ConversationHistory(
-                user_name=conversation_data["username"],
-                role=conversation_data["role"],
-                message=conversation_data["message"],
-                created_at=dt.datetime.now(),
-            )
-            self.db.add(db_record)
-            self.db.commit()
-
-            print("Saved conversations!")
-
+            with self.__open_db_conn__() as conn:
+                for msg in messages:
+                    statement = text(
+                        f"""INSERT INTO conv_history(user_name, role, message, created_at) VALUES(:username, :role, :message, '{dt.datetime.now()}')"""
+                    )
+                    conn.execute(statement, msg)
+                conn.commit()
             return True
 
         except Exception as e:
             print(f"Error saving conversation: {e}")
             return False
 
-    async def get_conversations(self, username: str, limit: int = 10) -> List[Dict]:
+    def get_conversations(self, username: str, limit: int = 5) -> list:
         try:
-            conversations = (
-                self.db.query(ConversationHistory)
-                .filter_by(user_id=username)
-                .order_by(ConversationHistory.created_at.desc())
-                .limit(limit)
-                .all()
-            )
+            with self.__open_db_conn__() as conn:
+                query = f"""SELECT role as role, message as content FROM conv_history WHERE user_name = '{username}' ORDER BY created_at DESC LIMIT {limit}"""
+                df = pd.read_sql(query, conn)
 
-            print("Got conversations: ")
-            print(conversations)
-            return [
-                {
-                    "username": conv.user_id,
-                    "message": conv.message,
-                    "tokens_used": conv.tokens_used,
-                    "created_at": conv.created_at.isoformat(),
-                }
-                for conv in conversations
-            ]
+            return df.to_dict(orient="records")[::-1]
+
         except Exception as e:
-            print(f"Error getting conversations: {e}")
-            return []
+            print(f"Error getting conversation: {e}")
+            return pd.DataFrame()

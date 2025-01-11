@@ -7,7 +7,9 @@ import re
 from .tool_processor import ToolProcessor
 from ..tools.create_query_tool import create_query_tool
 from ..config.settings import Settings
+from .database_service import DatabaseService
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
@@ -20,15 +22,20 @@ class ChatService:
         self.temperature = self.settings.TEMPERATURE
         self.client = OpenAI()
         self.tools = [create_query_tool]
-        self.messages = self.settings.BASE_MESSAGES
+        self.base_messages = self.settings.BASE_MESSAGES
+        self.messages = []
+        self.history_messages = []
+        self.database_service = DatabaseService()
 
     def __append_to_msgs__(self, message: str, role: str) -> None:
         msg_dict = {"role": role, "content": message}
         self.messages.append(msg_dict)
+        self.history_messages.append(msg_dict)
 
     def process_message(self, message: str) -> str:
-        self.__append_to_msgs__(message, "user")
+        self.messages = self.database_service.get_conversations("user_test")
 
+        self.__append_to_msgs__(message, "user")
         try:
             response = self.__send_completion_msg__()
 
@@ -38,14 +45,10 @@ class ChatService:
             print(f"Error processing message: {e}")
             return "Sorry, I encountered an error processing your message.", None, []
 
-    def __append_to_msgs__(self, message: str, role: str) -> None:
-        msg_dict = {"role": role, "content": message}
-        self.messages.append(msg_dict)
-
     def __send_completion_msg__(self):
         ret = self.client.chat.completions.create(
             model=self.model,
-            messages=self.messages,
+            messages=self.base_messages + self.messages,
             tools=self.tools,
             tool_choice="auto",
             temperature=self.temperature,
@@ -65,8 +68,16 @@ class ChatService:
 
         return response
 
+    def __save_history__(self) -> None:
+        msgs = [
+            {"role": msg["role"], "username": "user_test", "message": msg["content"]}
+            for msg in self.history_messages
+        ]
+        self.database_service.save_conversation(msgs)
+
     def __process_reasoning__(self, response: str, arr_plots=[]) -> str:
         response = response.strip("```")
+        self.__append_to_msgs__(response, "assistant")
 
         cont_response = self.__match_regex__(response, "contemplator").replace("#", "")
         ans_response = self.__match_regex__(response, "final_answer").replace("#", "")
@@ -80,15 +91,18 @@ class ChatService:
         # print("\nFinal Answer: ")
         # print(ans_response)
 
+        self.__save_history__()
+
         return cont_response, ans_response, arr_plots
 
     def __process_tools__(self, response_message: Dict[str, str]) -> str:
         tool_calls = getattr(response_message, "tool_calls", None)
         if not tool_calls:
+            self.__append_to_msgs__(response_message.content, role="assistant")
+            self.__save_history__()
             return response_message.content, None, []
 
-        self.messages.insert(2, self.settings.REASONING_MESSAGE)
-
+        self.base_messages.append(self.settings.REASONING_MESSAGE)
         arr_plots = []
         self.messages.append(response_message)
         for tool_call in tool_calls:
