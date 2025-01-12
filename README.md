@@ -2,8 +2,8 @@
 
 This project provides a natural language interface to retrieve database information. It allows users to interact with the database by asking questions in plain language. 
 
-![chat_1](https://i.imgur.com/a/M8WOwkI) 
-![chat_2](https://i.imgur.com/a/v0yrdgI)
+![chat_1](https://i.imgur.com/a/M8WOwkI.pgn) 
+![chat_2](https://i.imgur.com/a/v0yrdgI.pgn)
 
 ## Tools and Frameworks
 
