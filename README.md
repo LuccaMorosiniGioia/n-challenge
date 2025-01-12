@@ -1,6 +1,7 @@
 # Data Analytics Chatbot with LLMs
 
 This project provides a natural language interface to retrieve database information. It allows users to interact with the database by asking questions in plain language. 
+The chatbot is capable of creating complex SQL Queries and Plots to represent the extracted data. It will choose the best plot to fit the data if it thinks a plot is needed (It may not create a plot to represent basic data).
 
 ![chat1](https://i.ibb.co/pQD82qt/chat-1.jpg)  
 ![chat2](https://i.ibb.co/zS6Z7n4/chat-2.jpg)
@@ -85,7 +86,11 @@ black .
     - **tool_processor.py**: chat_service tool processor Class. Responsible for integrating the user desire to query the database with the sql and plot service returning the data the chat_service needs to create an output and plots to represent the data.
     - **database_service**: Class responsible for interfacing all database related tools.
 - **tools/**: Tools definitions used by the services.
+- **config/settings.py**: .env & LLM-Prompts interface.
 
 ### Database
 
 - **db_script.py**: Python script to extract .csv file and upload it to PostgreSQL database hosted on RDS.
+
+### Design Choices
+

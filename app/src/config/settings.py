@@ -178,9 +178,3 @@ class Settings(BaseModel):
                         """,
             },
         ]
-
-        # Horizontal bar chart
-        # Line plot
-        # Scatter plot
-        # Stem plot
-        # Stacked bar chart
