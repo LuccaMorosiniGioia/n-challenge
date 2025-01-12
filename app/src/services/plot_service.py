@@ -7,6 +7,7 @@ import json
 from ..tools.create_scatter_chart_tool import create_scatter_chart_tool
 from ..tools.create_bar_chart_tool import create_bar_chart_tool
 from ..tools.create_horizontal_bar_chart_tool import create_horizontal_bar_chart_tool
+from ..tools.create_pie_chart_tool import create_pie_chart_tool
 from ..config.settings import Settings
 import matplotlib.pyplot as plt
 from ast import literal_eval
@@ -21,12 +22,13 @@ class PlotService:
         openai.api_key = self.settings.OPENAI_API_KEY
         self.model = self.settings.OPENAI_MODEL
         self.temperature = 0
-        self.client = OpenAI()
+        self.client = OpenAI(api_key=self.settings.OPENAI_API_KEY)
         self.messages = self.settings.BASE_PLOT_MESSAGES
         self.tools = [
             create_bar_chart_tool,
             create_scatter_chart_tool,
             create_horizontal_bar_chart_tool,
+            create_pie_chart_tool,
         ]
 
     def __append_to_msgs__(self, message: str, role: str) -> None:
@@ -131,6 +133,17 @@ class PlotService:
 
         return fig
 
+    def __process_pie_chart__(self, tool_args: Dict[str, str]) -> plt.figure:
+        labels = self.__eval_arr__(tool_args.get("labels"))
+        sizes = self.__eval_arr__(tool_args.get("sizes"))
+        title = tool_args.get("title")
+
+        fig, ax = plt.subplots()
+        ax.pie(sizes, labels=labels, autopct="%1.1f%%")
+        ax.set_title(title)
+
+        return fig
+
     def __process_tools__(self, response_message: Dict[str, str]) -> str:
         tool_calls = getattr(response_message, "tool_calls", None)
         if not tool_calls:
@@ -144,6 +157,7 @@ class PlotService:
                 "Horizontal Bar Chart",
                 self.__process_h_bar_chart__,
             ),
+            "create_pie_chart_tool": ("Pie Chart", self.__process_pie_chart__),
         }
 
         plots = []

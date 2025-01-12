@@ -20,7 +20,7 @@ class ChatService:
         openai.api_key = self.settings.OPENAI_API_KEY
         self.model = self.settings.OPENAI_MODEL
         self.temperature = self.settings.TEMPERATURE
-        self.client = OpenAI()
+        self.client = OpenAI(api_key=self.settings.OPENAI_API_KEY)
         self.tools = [create_query_tool]
         self.base_messages = self.settings.BASE_MESSAGES
         self.messages = []

@@ -13,6 +13,9 @@ create_scatter_chart_tool = {
                     "type": "string",
                     "description": f"""
                                 Array with the classes in the format: ["className1", "className2", "className3"].
+                                # Return Type:
+                                    1-D Array on the format:
+                                    []
                                 """,
                 },
                 "x-axis": {
@@ -27,7 +30,7 @@ create_scatter_chart_tool = {
                                 Example:
                                     If you need to return null and the array is made up string elements, you should return "null" instead of null.
                                 # Return Type:
-                                    2-D Matrix on the format:
+                                    2-D Matrix with the same numbers of rows as classes on the format:
                                     [[], [], ...]
                                 """,
                 },
@@ -40,7 +43,7 @@ create_scatter_chart_tool = {
                                 Example:
                                     If you need to return null and the array is made up string elements, you should return "null" instead of null.
                                 # Return Type:
-                                    2-D Matrix on the format:
+                                    2-D Matrix with the same numbers of rows as classes on the format:
                                     [[], [], ...]
                                 """,
                 },

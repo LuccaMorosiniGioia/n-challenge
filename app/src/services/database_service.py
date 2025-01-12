@@ -8,7 +8,6 @@ from typing import Dict, Any, Tuple, List
 from sqlalchemy.engine import URL, Engine
 from sqlalchemy.sql import text
 from sqlalchemy.orm import scoped_session, sessionmaker, Session
-from ..models.conversations_history import ConversationHistory
 from ..config.settings import Settings
 
 

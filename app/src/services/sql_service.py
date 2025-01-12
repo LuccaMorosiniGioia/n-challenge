@@ -14,7 +14,7 @@ class SqlService:
         openai.api_key = self.settings.OPENAI_API_KEY
         self.model = self.settings.OPENAI_MODEL
         self.temperature = 0
-        self.client = OpenAI()
+        self.client = OpenAI(api_key=self.settings.OPENAI_API_KEY)
         self.messages = self.settings.BASE_SQL_MESSAGES
 
     def __append_to_msgs__(self, message: str, role: str) -> None:

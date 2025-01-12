@@ -29,11 +29,7 @@ if prompt := st.chat_input():
         )
         st.chat_message("assistant").markdown(reas_response)
     else:
-        text = f"""Raciocínio:  
-        {reas_response}  
-        Conclusão:  
-        {fin_resp}  
-        """
+        text = f"""{reas_response}\n{fin_resp}"""
         st.session_state.messages.append({"role": "assistant", "content": text})
         st.chat_message("assistant").markdown(text)
 
