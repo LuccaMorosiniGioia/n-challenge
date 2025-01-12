@@ -2,13 +2,14 @@
 
 This project provides a natural language interface to retrieve database information. It allows users to interact with the database by asking questions in plain language. 
 
-![chat_1](https://i.imgur.com/a/M8WOwkI.pgn) 
-![chat_2](https://i.imgur.com/a/v0yrdgI.pgn)
+![chat1](https://i.ibb.co/pQD82qt/chat-1.jpg)  
+![chat2](https://i.ibb.co/zS6Z7n4/chat-2.jpg)
+
 
 ## Tools and Frameworks
 
 - **LLM**: ChatGPT-4o (OpenAI API)
-- **Frontend**: Streamlit
+- **Frontend**: Streamlit 
 - **Database**: PostgreSQL + SQLAlchemy & psycopg2
 - **Cloud**: AWS RDS
 - **Data Manipulation and Visualization**: Pandas + Matplotlib
