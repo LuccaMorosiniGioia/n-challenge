@@ -45,7 +45,7 @@ pip install -r requirements.txt
 
 ### 3. Configure environment variables
 
-Set up your `.env` file with the required credentials and other environment variables:
+Set up your `secrets.toml` in `app/.streamlit/secrets.toml` file with the required credentials and other environment variables:
 
 ```.env
 OPENAI_API_KEY='your-openai-api-key'
@@ -58,14 +58,6 @@ Once the environment is set up, you can run the application with:
 
 ```
 streamlit run app.py
-```
-
-## Util Commands
-
-Format code:
-```bash
-cd app
-black .
 ```
 
 ## 🗂️ Project Structure
@@ -93,4 +85,6 @@ black .
 - **db_script.py**: Python script to extract .csv file and upload it to PostgreSQL database hosted on RDS.
 
 ### Design Choices
+
+
 

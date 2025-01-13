@@ -113,7 +113,7 @@ class Settings(BaseModel):
             },
             {
                 "role": "system",
-                "content": """ALWAYS ANSWER THE USER IN THE SAME LANGUAGE THEY ASKED THE QUESTION.""",
+                "content": """Always answer the user in the same language they asked the question.""",
             },
         ]
 

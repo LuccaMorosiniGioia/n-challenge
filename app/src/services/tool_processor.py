@@ -22,6 +22,7 @@ class ToolProcessor:
             "Generate a SQL Query to answer the following question: " + question
         )
 
+        # First we send to the sql service the question with the prompt to generate a SQL query
         try:
             sql_query = (
                 self.sql_service.process_message(complete_question)
@@ -36,12 +37,14 @@ class ToolProcessor:
         print("\nSQL QUERY: ")
         print(sql_query)
 
+        # Then we send the query to the database service to get the response
         try:
             response_df = self.database_service.query_db(sql_query)
         except Exception as e:
             print(f"Error processing query on database service: {e}")
             raise RuntimeError(f"{e}")
 
+        # Finally we send the response to the plot service to get the best plot to fit the data considering the users question
         complete_question = (
             "# Chose the best plot to fit this Dataset: "
             + response_df.to_json()
@@ -57,6 +60,9 @@ class ToolProcessor:
         return response_df.to_json(), plots
 
     def process(self, tool_args):
+
+        # For now we only process database queries, but we could add more tools by just creating 
+        # a new function or if the process is more complex we can create a dedicated class for each tool
         processor_map = {
             "create_query": self.__create_query__,
         }

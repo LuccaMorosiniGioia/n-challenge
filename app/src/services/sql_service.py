@@ -22,6 +22,9 @@ class SqlService:
         self.messages.append(msg_dict)
 
     def process_message(self, message: str) -> str:
+        # The structure of the messages is the same as the other services. 
+        # This one is a little more simple since it doesn't have to process any tools.
+        # It just send the questions and receives a SQL query in return.
         self.__append_to_msgs__(message, "user")
 
         try:

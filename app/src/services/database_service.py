@@ -35,6 +35,7 @@ class DatabaseService:
     def __open_db_conn__(self) -> None:
         return self.__create_engine__().connect()
 
+    # Method to execute a raw SQL query created from the LLM and return a DataFrame that we can easily send back with .to_json method.
     def query_db(self, query: str) -> pd.DataFrame:
         with self.__open_db_conn__() as conn:
             try:
@@ -45,6 +46,7 @@ class DatabaseService:
 
         return df
 
+    # To maintain the conversation history we save the messages in the same database as the credit score data.
     def save_conversation(self, messages: Dict) -> bool:
         try:
             with self.__open_db_conn__() as conn:

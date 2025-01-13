@@ -3,7 +3,6 @@ from openai import OpenAI
 from typing import Dict
 import json
 
-
 from ..tools.create_scatter_chart_tool import create_scatter_chart_tool
 from ..tools.create_bar_chart_tool import create_bar_chart_tool
 from ..tools.create_horizontal_bar_chart_tool import create_horizontal_bar_chart_tool
@@ -24,6 +23,8 @@ class PlotService:
         self.temperature = 0
         self.client = OpenAI(api_key=self.settings.OPENAI_API_KEY)
         self.messages = self.settings.BASE_PLOT_MESSAGES
+
+        # The way the LLM decides which tool to use is by returning a tool call for the corresponding plot.
         self.tools = [
             create_bar_chart_tool,
             create_scatter_chart_tool,
@@ -36,6 +37,7 @@ class PlotService:
         self.messages.append(msg_dict)
 
     def process_message(self, message: str) -> str:
+        # The flow is the same as the chat service. In this case we have more tools to process, one for each type of plot.
         self.__append_to_msgs__(message, "user")
         try:
             response = self.__send_completion_msg__()
@@ -47,6 +49,10 @@ class PlotService:
             raise RuntimeError(f"{e}")
 
     def __eval_arr__(self, arr) -> list:
+        # In this function we make sure that we can process the parameters returned from the model for each of the plots.
+        # Not 100% of time the mode will return the correct tpye, so we need to make sure that we can process the data.
+        # Example: if it returns "1", "2", "3", [1, 2, 3] or ["1", "2", "3"] we can correctly create the plots.
+
         if not isinstance(arr, list):
             # Ensure that null is a string
             arr = arr.replace("null", '"null"').replace('""', '"')
@@ -63,13 +69,16 @@ class PlotService:
                 except Exception as e:
                     print(f"Error evaluating array: {e}")
                     raise RuntimeError(f"{e}")
+                
+        # In this case the exception is not necessarily an error, if the array is made up of actual string we need to keep it that way.
         try:
             arr = [float(x) for x in arr]  # Try to convert to float
         except Exception as e:
             print(f"Error converting to float: {e}")
 
         return arr
-
+    
+    # All charts processing follow the same logic of extracting the parameters and creating the plot.
     def __process_h_bar_chart__(self, tool_args: Dict[str, str]) -> plt.figure:
         x = self.__eval_arr__(tool_args.get("x-axis"))
         y = self.__eval_arr__(tool_args.get("y-axis"))
@@ -145,6 +154,7 @@ class PlotService:
         return fig
 
     def __process_tools__(self, response_message: Dict[str, str]) -> str:
+        # Same logic of processing tools as the chat_service. In this case each tool call is a new plot to be created.
         tool_calls = getattr(response_message, "tool_calls", None)
         if not tool_calls:
             print("No tool calls. Response: ", response_message)

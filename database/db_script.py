@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
+## Same dabatase methods used in the database_service.py file for the chatbot
 def create_engine():
     server = os.getenv("db_endpoint")
     database = os.getenv("database")
@@ -41,6 +41,7 @@ def query_db(query: str) -> pd.DataFrame:
 
     return df
 
+# Load the data and clean it keeping null values for the model to decide what to do with them
 df = pd.read_csv("train.csv")
 df = df[['REF_DATE', 'TARGET', 'VAR2', 'IDADE', 'VAR4', 'VAR5', 'VAR8']]
 df = df.set_axis(['ref_date', 'target', 'sexo', 'idade','obito', 'uf', 'classe'], axis='columns')
@@ -50,6 +51,7 @@ df.to_csv("train_cleaned.csv", index=False)
 
 # df = pd.read_csv("train_cleaned.csv")
 
+# Insert the data into the database
 try:
     conn = open_db_conn()
     conn.autocommit = True
