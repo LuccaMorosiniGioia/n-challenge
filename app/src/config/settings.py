@@ -2,19 +2,29 @@ from pydantic import BaseModel, Field
 from typing import Dict, Any, Tuple, List
 import datetime as dt
 import os
+import streamlit as st
 from dotenv import load_dotenv
 
 load_dotenv()
 
 
 class Settings(BaseModel):
-    OPENAI_API_KEY: str = Field(default=os.getenv("OPENAI_API_KEY", ""))
-    OPENAI_MODEL: str = Field(default=os.getenv("OPENAI_MODEL", "gpt-4o"))
-    TEMPERATURE: float = Field(default=float(os.getenv("TEMPERATURE", "0.5")))
-    SERVER: str = Field(default=os.getenv("SERVER", ""))
-    DATABASE: str = Field(default=os.getenv("DATABASE", ""))
-    DATABASE_USER: str = Field(default=os.getenv("DATABASE_USER", ""))
-    DATABASE_PASS: str = Field(default=os.getenv("DATABASE_PASS", ""))
+    # OPENAI_API_KEY: str = Field(default=os.getenv("OPENAI_API_KEY", ""))
+    # OPENAI_MODEL: str = Field(default=os.getenv("OPENAI_MODEL", "gpt-4o"))
+    # TEMPERATURE: float = Field(default=float(os.getenv("TEMPERATURE", "0.5")))
+    # SERVER: str = Field(default=os.getenv("SERVER", ""))
+    # DATABASE: str = Field(default=os.getenv("DATABASE", ""))
+    # DATABASE_USER: str = Field(default=os.getenv("DATABASE_USER", ""))
+    # DATABASE_PASS: str = Field(default=os.getenv("DATABASE_PASS", ""))
+
+    OPENAI_API_KEY: str = Field(default=st.secrets["OPENAI_API_KEY"])
+    OPENAI_MODEL: str = Field(default=st.secrets["OPENAI_MODEL"])
+    TEMPERATURE: float = Field(default=float(st.secrets["TEMPERATURE"]))
+    SERVER: str = Field(default=st.secrets["SERVER"])
+    DATABASE: str = Field(default=st.secrets["DATABASE"])
+    DATABASE_USER: str = Field(default=st.secrets["DATABASE_USER"])
+    DATABASE_PASS: str = Field(default=st.secrets["DATABASE_PASS"])
+
 
     @property
     def REASONING_MESSAGE(self) -> List[Dict[str, str]]:
