@@ -20,7 +20,7 @@ class PlotService:
         self.settings = Settings()
         openai.api_key = self.settings.OPENAI_API_KEY
         self.model = self.settings.OPENAI_MODEL
-        self.temperature = 0
+        self.temperature = self.settings.TEMPERATURE
         self.client = OpenAI(api_key=self.settings.OPENAI_API_KEY)
         self.messages = self.settings.BASE_PLOT_MESSAGES
 
@@ -69,7 +69,7 @@ class PlotService:
                 except Exception as e:
                     print(f"Error evaluating array: {e}")
                     raise RuntimeError(f"{e}")
-                
+
         # In this case the exception is not necessarily an error, if the array is made up of actual string we need to keep it that way.
         try:
             arr = [float(x) for x in arr]  # Try to convert to float
@@ -77,7 +77,7 @@ class PlotService:
             print(f"Error converting to float: {e}")
 
         return arr
-    
+
     # All charts processing follow the same logic of extracting the parameters and creating the plot.
     def __process_h_bar_chart__(self, tool_args: Dict[str, str]) -> plt.figure:
         x = self.__eval_arr__(tool_args.get("x-axis"))

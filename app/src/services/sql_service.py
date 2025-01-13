@@ -13,6 +13,9 @@ class SqlService:
         self.settings = Settings()
         openai.api_key = self.settings.OPENAI_API_KEY
         self.model = self.settings.OPENAI_MODEL
+
+        # For this model we set the temperature to 0 to get the most deterministic output possible.
+        # For the same question we would expect the same query.
         self.temperature = 0
         self.client = OpenAI(api_key=self.settings.OPENAI_API_KEY)
         self.messages = self.settings.BASE_SQL_MESSAGES
@@ -22,7 +25,7 @@ class SqlService:
         self.messages.append(msg_dict)
 
     def process_message(self, message: str) -> str:
-        # The structure of the messages is the same as the other services. 
+        # The structure of the messages is the same as the other services.
         # This one is a little more simple since it doesn't have to process any tools.
         # It just send the questions and receives a SQL query in return.
         self.__append_to_msgs__(message, "user")

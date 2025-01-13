@@ -9,6 +9,7 @@ from ..tools.create_query_tool import create_query_tool
 from ..config.settings import Settings
 from .database_service import DatabaseService
 from dotenv import load_dotenv
+
 load_dotenv()
 
 

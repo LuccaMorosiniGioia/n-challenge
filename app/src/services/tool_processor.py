@@ -61,7 +61,7 @@ class ToolProcessor:
 
     def process(self, tool_args):
 
-        # For now we only process database queries, but we could add more tools by just creating 
+        # For now we only process database queries, but we could add more tools by just creating
         # a new function or if the process is more complex we can create a dedicated class for each tool
         processor_map = {
             "create_query": self.__create_query__,

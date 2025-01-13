@@ -25,7 +25,6 @@ class Settings(BaseModel):
     DATABASE_USER: str = Field(default=st.secrets["DATABASE_USER"])
     DATABASE_PASS: str = Field(default=st.secrets["DATABASE_PASS"])
 
-
     @property
     def REASONING_MESSAGE(self) -> List[Dict[str, str]]:
         return {

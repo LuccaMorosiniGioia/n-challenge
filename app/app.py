@@ -4,7 +4,7 @@ from src.services.chat_service import ChatService
 openai_service = ChatService()
 
 
-# Simple chatbot interface from the Streamlit Chat example. 
+# Simple chatbot interface from the Streamlit Chat example.
 # It was modified to support receiving a reasoning and a final anwser response and plotting charts if needed.
 st.title("💬 Chatbot")
 if "messages" not in st.session_state:

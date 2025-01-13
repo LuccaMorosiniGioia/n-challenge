@@ -47,8 +47,8 @@ pip install -r requirements.txt
 
 Set up your `secrets.toml` in `app/.streamlit/secrets.toml` file with the required credentials and other environment variables:
 
-```.env
-OPENAI_API_KEY='your-openai-api-key'
+```secrets.toml
+OPENAI_API_KEY="your-openai-api-key"
 ...
 ```
 
@@ -84,7 +84,16 @@ streamlit run app.py
 
 - **db_script.py**: Python script to extract .csv file and upload it to PostgreSQL database hosted on RDS.
 
-### Design Choices
+## Design Choices
+
+- **LLM:** OpenAI api was chosen for the familiarity i had with its API and tool calling format.
+- **Chat Service:** The current model calling format of `model_class.process_message()` can be easily ported to a API service serving multiple users. All we need as input is the question asked and some identifier for the user in order to load previous messages from the database. For sake of testing and easily using the streamlit interface everything is being done synchronously. 
+- **Tools:** Although the main chat_service does not use a loot of tools, its current structure is ready to receive more with an ease of implementation. All we have to do is create the tool json definition and a method/class to process its call and add a call to it whenever that tool is called by the model. 
+- **SQL Service:** An sql specific agent was created to create SQL queries to maximize its probability of generating the correct one. We could have everything inside the same model `chat_service+sql_service+plot_service` (all the prompts together), but passing to the open AI API just the knowledge and instruction to query the specific table we needed made it so much more powerful.
+- **Plot Service:** The same logic goes to the chart creating model. We feed to it only the information needed to come up with the best plot to fit the data and user question. 
+- **Database:** In order to have more users interacting with the application all that would be needed is an extra column on the conversation history identifying the user. With this coming along side the questions asked from the frontend each user would have it's own chat history. 
+- **AWS:** It was chosen for the ease of creating a new database on RDS to host our data. Mostly everything could be used inside the free-tier plans. AWS only charged small amounts (cents of dolar) for the public VPC in order to connect to the database from outside of AWS services. 
+- **Streamlit Interface:** Not a lot of work was put into the frontend of the applicantion. I used as starting point an example chatbot interface provided by streamlit that worked well to focus more on developing the LLMs prompts and "backend" processing. The backend itself holds the information of the conversation history, but if the front is reloaded it will not reload it. 
 
 
 
