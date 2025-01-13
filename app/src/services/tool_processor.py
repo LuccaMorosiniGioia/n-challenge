@@ -26,9 +26,9 @@ class ToolProcessor:
         try:
             sql_query = (
                 self.sql_service.process_message(complete_question)
-                .strip("***")
                 .strip("'''")
                 .strip("```")
+                .strip("***") 
             )  # Sometimes the response comes with these characters
         except Exception as e:
             print(f"Error processing message on sql service: {e}")

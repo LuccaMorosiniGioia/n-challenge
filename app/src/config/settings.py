@@ -174,6 +174,7 @@ class Settings(BaseModel):
                         Given a dataset, you must return the best plots to represent the data. You must use the provided tools to do so.
                         Reason precisely on the best plots to represent the data and the one that creates more insights, the dataset must fit in the plot parameters.
                         You can choose not to plot the data if it does not fit in any of the available plots or choose multiple plots if the data fits in more than one plot.
+                        If you choose to create a plot alwways call its corresponding tool.
                         The possible plots are:
                             # Vertical Bar Chart
                                 Use this graph whenever you need to compare up to two variables.
